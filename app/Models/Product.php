@@ -30,4 +30,9 @@ class Product extends Model
     {
         return $this->belongsTo(Media::class);
     }
+
+    public function childProduct()
+    {
+        return $this->hasMany(ChildProduct::class);
+    }
 }

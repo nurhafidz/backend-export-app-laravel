@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ChildProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,4 +55,28 @@ Route::group(['prefix' => 'media', 'controller' => MediaController::class], func
         Route::post('/update/{id}', 'updateSingleData');
         Route::post('/deletesingle', 'destroySingleData');
     });
+});
+Route::group(['prefix' => 'product', 'controller' => ProductController::class], function () {
+
+    Route::get('/getall', 'getAll');
+    Route::get('/getproductlist', 'getProductList');
+    // Route::get('/filterproduct', 'filterProduct');
+
+    Route::middleware('auth:api')->group(function () {
+        Route::post('/createsingle', 'createSingleProduct');
+        Route::post('/updatesingle/{id}', 'updateSingleProduct');
+        Route::post('/deletesingle', 'destroySingleProduct');
+    });
+});
+
+Route::group(['prefix' => 'childproduct', 'controller' => ChildProductController::class], function () {
+    Route::post('/createsingle', 'storeSingleData');
+    // Route::get('/getall', 'getAll');
+    // Route::get('/filterproduct', 'filterProduct');
+
+    // Route::middleware('auth:api')->group(function () {
+    //     Route::post('/createsingle', 'storeSingleData');
+    //     Route::post('/update/{id}', 'updateSingleData');
+    //     Route::post('/deletesingle', 'destroySingleData');
+    // });
 });

@@ -97,7 +97,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 400);
+            ], 422);
         }
 
         $idCategory = explode(",", $request->id);
@@ -133,7 +133,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 400);
+            ], 422);
         }
 
         try {
@@ -160,7 +160,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 400);
+            ], 422);
         }
         try {
             $category = Category::where('title', 'LIKE', '%' . $request->title . '%')->with('child')->get();
@@ -185,7 +185,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 400);
+            ], 422);
         }
         try {
             $category = Category::where('type', $request->type)->with('child')->get();

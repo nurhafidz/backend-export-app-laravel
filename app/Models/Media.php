@@ -19,8 +19,12 @@ class Media extends Model
         'original_name'
     ];
 
-    public function Product()
+    public function product()
     {
         return $this->hasMany(Product::class);
+    }
+    public function childproduct()
+    {
+        return $this->belongsToMany(ChildProduct::class);
     }
 }
