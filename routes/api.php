@@ -30,7 +30,7 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::group(['prefix' => 'category', 'controller' => CategoryController::class], function () {
     Route::get('/getall', 'index');
-    Route::get('/searchbyid', 'searchById');
+    Route::post('/searchbyid', 'searchById');
     Route::get('/searchbytitle', 'searchBySimilarTitle');
     Route::get('/searchbytype', 'searchByType');
     Route::middleware('auth:api')->group(function () {
@@ -41,8 +41,16 @@ Route::group(['prefix' => 'category', 'controller' => CategoryController::class]
 });
 
 Route::group(['prefix' => 'media', 'controller' => MediaController::class], function () {
+    Route::get('/getall', 'getAll');
+    Route::get('/getbystatus', 'getByStatus');
+    Route::get('/getbytype', 'getByType');
+    Route::post('/findbyid', 'findById');
+    Route::get('/findbytitle', 'findBytitle');
+    Route::get('/findbylink', 'findByLink');
+    Route::get('/findbyoriginalname', 'findByOriginalName');
     Route::middleware('auth:api')->group(function () {
         Route::post('/createsingle', 'storeSingleData');
         Route::post('/update/{id}', 'updateSingleData');
+        Route::post('/deletesingle', 'destroySingleData');
     });
 });

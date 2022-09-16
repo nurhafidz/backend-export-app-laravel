@@ -18,4 +18,9 @@ class Media extends Model
         'status',
         'original_name'
     ];
+
+    public function Product()
+    {
+        return $this->hasMany(Product::class);
+    }
 }

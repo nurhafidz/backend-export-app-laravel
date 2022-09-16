@@ -13,9 +13,6 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::whereNull('parent_id')->with('child')->get();
-        // $categories = Category::findOrFail('9b16bdee-6efd-4fe2-9a24-839dd10005ee')->first();
-        // $child = $categories->child;
-        // dd($categories);
         return response()->json([
             'status' => 'success',
             'message' => 'Category was successfully retrieved',
@@ -32,7 +29,7 @@ class CategoryController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Parent id could not be found',
-                ], 500);
+                ], 400);
             }
             $category = Category::create([
                 'title' => Str::lower($request->title),
@@ -65,7 +62,7 @@ class CategoryController extends Controller
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Parent id could not be found',
-                    ], 500);
+                    ], 400);
                 }
                 $getCategory->update([
                     'title' => Str::lower($request->title),
@@ -86,7 +83,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Id could not be found',
-            ], 500);
+            ], 400);
         }
     }
 
@@ -100,7 +97,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 500);
+            ], 400);
         }
 
         $idCategory = explode(",", $request->id);
@@ -123,7 +120,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Id category does not exist',
-            ], 500);
+            ], 400);
         }
     }
 
@@ -136,7 +133,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 500);
+            ], 400);
         }
 
         try {
@@ -151,7 +148,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Category not found',
-            ], 500);
+            ], 400);
         }
     }
     public function searchBySimilarTitle(Request $request)
@@ -163,7 +160,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 500);
+            ], 400);
         }
         try {
             $category = Category::where('title', 'LIKE', '%' . $request->title . '%')->with('child')->get();
@@ -176,7 +173,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Category not found',
-            ], 500);
+            ], 400);
         }
     }
     public function searchByType(Request $request)
@@ -188,7 +185,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 500);
+            ], 400);
         }
         try {
             $category = Category::where('type', $request->type)->with('child')->get();
@@ -201,7 +198,7 @@ class CategoryController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Category not found',
-            ], 500);
+            ], 400);
         }
     }
 }

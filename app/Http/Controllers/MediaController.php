@@ -24,7 +24,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 500);
+            ], 400);
         }
 
 
@@ -36,7 +36,7 @@ class MediaController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors()->all(),
-                ], 500);
+                ], 400);
             }
 
             $media = Media::create([
@@ -60,7 +60,7 @@ class MediaController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors()->all(),
-                ], 500);
+                ], 400);
             }
 
             $image = $request->file('file');
@@ -89,6 +89,7 @@ class MediaController extends Controller
 
     private function removeFile($media)
     {
+
         $extension = explode('.', $media->original_name);
         $uploadFolder = $media->type . "/" . end($extension);
         $image_path = public_path() . '/storage/' . $uploadFolder . '/' . $media->original_name;
@@ -108,7 +109,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 500);
+            ], 400);
         }
 
         try {
@@ -117,7 +118,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => "Id doesn't exist",
-            ], 500);
+            ], 400);
         }
 
         if ($request->type == "link") {
@@ -128,10 +129,17 @@ class MediaController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors()->all(),
-                ], 500);
+                ], 400);
             }
             if (($request->type == "link") != ($media->type == "link")) {
-                $this->removeFile($media);
+                try {
+                    $this->removeFile($media);
+                } catch (\Throwable $th) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => "Image not available in storage",
+                    ], 500);
+                };
             }
 
             $media = $media->update([
@@ -159,10 +167,17 @@ class MediaController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors()->all(),
-                ], 500);
+                ], 400);
             }
 
-            $this->removeFile($media);
+            try {
+                $this->removeFile($media);
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Image not available in storage",
+                ], 500);
+            }
 
             $image = $request->file('file');
             $uploadFolder = ($request->type) ? $request->type : $media->type . "/" . $image->extension();
@@ -196,5 +211,205 @@ class MediaController extends Controller
                 'data' => $media
             ], 200);
         }
+    }
+
+    public function destroySingleData(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], 400);
+        }
+        try {
+            $media = Media::findOrFail($request->id);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Id doesn't exist",
+            ], 400);
+        }
+
+
+        if ($media->type != "link") {
+            try {
+                $this->removeFile($media);
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Image not available in storage",
+                ], 500);
+            }
+            Media::destroy($media->id);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Delete media successfully',
+            ], 200);
+        } else {
+            Media::destroy($media->id);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Delete media successfully',
+            ], 200);
+        }
+    }
+
+    public function findByOriginalName(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'original_name' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], 400);
+        }
+        try {
+            $media = Media::where('original_name', $request->original_name)->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Media was successfully retrieved',
+                'data' => $media
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Original name doesn't exist",
+            ], 400);
+        }
+    }
+
+    public function findByLink(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'link' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], 400);
+        }
+        try {
+            $media = Media::where('link', $request->link)->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Media was successfully retrieved',
+                'data' => $media
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Link doesn't exist",
+            ], 400);
+        }
+    }
+
+    public function findByTitle(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], 400);
+        }
+        try {
+            $media = Media::where('title', 'LIKE', '%' . $request->title . '%')->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Media was successfully retrieved',
+                'data' => $media
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Title doesn't exist",
+            ], 400);
+        }
+    }
+
+    public function findById(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], 400);
+        }
+        try {
+            $media = Media::findOrFail($request->id);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Media was successfully retrieved',
+                'data' => $media
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Id doesn't exist",
+            ], 400);
+        }
+    }
+
+    public function getAll(Request $requesy)
+    {
+        $media = Media::all();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Media was successfully retrieved',
+            'data' => $media
+        ], 200);
+    }
+
+    public function getByStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|boolean',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], 400);
+        }
+        $media = Media::where('status', $request->status)->get();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Media was successfully retrieved',
+            'data' => $media
+        ], 200);
+    }
+
+    public function getByType(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|in:image_product,file_product,image_blog,file_blog,link,image_index,image_galery,file',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all(),
+            ], 400);
+        }
+        $media = Media::where('type', $request->type)->get();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Media was successfully retrieved',
+            'data' => $media
+        ], 200);
     }
 }
