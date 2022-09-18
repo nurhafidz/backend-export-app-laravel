@@ -5,15 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
+use App\Models\Admin;
 use App\Http\Controllers\ValidationException;
 
-class AuthController extends Controller
+class AuthAdminController extends Controller
 {
-
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware(['assign.guard:admin', 'jwt.auth'], ['except' => ['login', 'register']]);
     }
 
     public function login(Request $request)
@@ -25,7 +24,7 @@ class AuthController extends Controller
         $credentials = $request->only(['email', 'password']);
 
 
-        $token = Auth::attempt($credentials);
+        $token = auth()->guard('admin')->attempt($credentials);
 
         if (!$token) {
             return response()->json([
@@ -34,13 +33,15 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = Auth::user();
+
+        $admin = Auth::guard('admin')->user();
         return response()->json([
             'status' => 'success',
-            'user' => $user,
+            'user' => $admin,
             'authorisation' => [
                 'token' => $token,
                 'type' => 'bearer',
+                'expires_in' => auth()->guard('admin')->factory()->getTTL() * 60
             ]
         ]);
     }
@@ -53,29 +54,35 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        $user = User::create([
+        $admin = Admin::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        $token = Auth::login($user);
-        if (Auth::attempt($request->only('email', 'password'))) {
+        $token = auth()->guard('admin')->login($admin);
+        if (auth()->guard('admin')->attempt($request->only('email', 'password'))) {
             return response()->json([
                 'status' => 'success',
-                'message' => 'User created successfully',
-                'user' => $user,
-                'authorisation' => [
+                'message' => 'Admin created successfully',
+                'user' => $admin,
+                'authorization' => [
                     'token' => $token,
                     'type' => 'bearer',
+                    'expires_in' => auth()->guard('admin')->factory()->getTTL() * 60
                 ]
             ]);
         }
         return response()->json([
-            'status' => 'success',
+            'status' => 'error',
             'message' => 'error cant login',
 
         ], 400);
+    }
+
+    public function getProfile()
+    {
+        return response()->json(Auth::guard('admin')->user());
     }
 
     public function logout()
@@ -91,10 +98,11 @@ class AuthController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'user' => Auth::user(),
-            'authorisation' => [
+            'user' => Auth::guard('admin')->user(),
+            'authorization' => [
                 'token' => Auth::refresh(),
                 'type' => 'bearer',
+                'expires_in' => auth()->guard('admin')->factory()->getTTL() * 60
             ]
         ]);
     }

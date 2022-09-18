@@ -28,7 +28,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             Category::findOrFail($request->category_id);
@@ -68,7 +68,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         switch ($request->status) {
             case 1 || "1" || true:
@@ -100,7 +100,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
 
         switch ($request->sort) {
@@ -142,7 +142,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             if ($request->category_id) {
@@ -185,7 +185,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             Product::destroy($request->product_id);
@@ -211,7 +211,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
     }
 }

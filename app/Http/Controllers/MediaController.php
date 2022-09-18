@@ -24,7 +24,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
 
 
@@ -36,7 +36,7 @@ class MediaController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors()->all(),
-                ], 422);
+                ], 400);
             }
 
             $media = Media::create([
@@ -60,7 +60,7 @@ class MediaController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors()->all(),
-                ], 422);
+                ], 400);
             }
 
             $image = $request->file('file');
@@ -109,7 +109,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
 
         try {
@@ -129,7 +129,7 @@ class MediaController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors()->all(),
-                ], 422);
+                ], 400);
             }
             if (($request->type == "link") != ($media->type == "link")) {
                 try {
@@ -167,7 +167,7 @@ class MediaController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors()->all(),
-                ], 422);
+                ], 400);
             }
 
             try {
@@ -222,7 +222,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             $media = Media::findOrFail($request->id);
@@ -266,7 +266,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             $media = Media::where('original_name', $request->original_name)->get();
@@ -293,7 +293,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             $media = Media::where('link', $request->link)->get();
@@ -320,7 +320,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             $media = Media::where('title', 'LIKE', '%' . $request->title . '%')->get();
@@ -347,7 +347,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             $media = Media::findOrFail($request->id);
@@ -384,7 +384,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         $media = Media::where('status', $request->status)->get();
         return response()->json([
@@ -403,7 +403,7 @@ class MediaController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         $media = Media::where('type', $request->type)->get();
         return response()->json([

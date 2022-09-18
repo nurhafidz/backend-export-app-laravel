@@ -2,11 +2,12 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthUserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ChildProductController;
+use App\Http\Controllers\AuthAdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::controller(AuthController::class)->group(function () {
+Route::group(['prefix' => 'user', 'controller' => AuthUserController::class], function () {
+    Route::post('login', 'login');
+    Route::post('register', 'register');
+    Route::post('logout', 'logout');
+    Route::post('refresh', 'refresh');
+});
+
+Route::group(['prefix' => 'admin', 'controller' => AuthAdminController::class], function () {
     Route::post('login', 'login');
     Route::post('register', 'register');
     Route::post('logout', 'logout');
@@ -35,10 +43,10 @@ Route::group(['prefix' => 'category', 'controller' => CategoryController::class]
     Route::post('/searchbyid', 'searchById');
     Route::get('/searchbytitle', 'searchBySimilarTitle');
     Route::get('/searchbytype', 'searchByType');
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(['assign.guard:admin', 'jwt.auth'])->group(function () {
         Route::post('/createsingle', 'storeSingleData');
-        Route::post('/update/{id}', 'update');
-        Route::post('/deletemany', 'destroy');
+        Route::patch('/update/{id}', 'update');
+        Route::delete('/deletemany', 'destroy');
     });
 });
 
@@ -52,8 +60,8 @@ Route::group(['prefix' => 'media', 'controller' => MediaController::class], func
     Route::get('/findbyoriginalname', 'findByOriginalName');
     Route::middleware('auth:api')->group(function () {
         Route::post('/createsingle', 'storeSingleData');
-        Route::post('/update/{id}', 'updateSingleData');
-        Route::post('/deletesingle', 'destroySingleData');
+        Route::patch('/update/{id}', 'updateSingleData');
+        Route::delete('/deletesingle', 'destroySingleData');
     });
 });
 Route::group(['prefix' => 'product', 'controller' => ProductController::class], function () {
@@ -64,8 +72,8 @@ Route::group(['prefix' => 'product', 'controller' => ProductController::class], 
 
     Route::middleware('auth:api')->group(function () {
         Route::post('/createsingle', 'createSingleProduct');
-        Route::post('/updatesingle/{id}', 'updateSingleProduct');
-        Route::post('/deletesingle', 'destroySingleProduct');
+        Route::patch('/updatesingle/{id}', 'updateSingleProduct');
+        Route::delete('/deletesingle', 'destroySingleProduct');
     });
 });
 

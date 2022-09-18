@@ -27,7 +27,7 @@ class ChildProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()->all(),
-            ], 422);
+            ], 400);
         }
         try {
             Product::findOrFail($request->product_id);
