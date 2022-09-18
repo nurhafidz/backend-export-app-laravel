@@ -58,7 +58,7 @@ Route::group(['prefix' => 'media', 'controller' => MediaController::class], func
     Route::get('/findbytitle', 'findBytitle');
     Route::get('/findbylink', 'findByLink');
     Route::get('/findbyoriginalname', 'findByOriginalName');
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(['assign.guard:admin', 'jwt.auth'])->group(function () {
         Route::post('/createsingle', 'storeSingleData');
         Route::patch('/update/{id}', 'updateSingleData');
         Route::delete('/deletesingle', 'destroySingleData');
@@ -70,7 +70,7 @@ Route::group(['prefix' => 'product', 'controller' => ProductController::class], 
     Route::get('/getproductlist', 'getProductList');
     // Route::get('/filterproduct', 'filterProduct');
 
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(['assign.guard:admin', 'jwt.auth'])->group(function () {
         Route::post('/createsingle', 'createSingleProduct');
         Route::patch('/updatesingle/{id}', 'updateSingleProduct');
         Route::delete('/deletesingle', 'destroySingleProduct');
@@ -82,7 +82,7 @@ Route::group(['prefix' => 'childproduct', 'controller' => ChildProductController
     // Route::get('/getall', 'getAll');
     // Route::get('/filterproduct', 'filterProduct');
 
-    // Route::middleware('auth:api')->group(function () {
+    // Route::middleware(['assign.guard:admin', 'jwt.auth'])->group(function () {
     //     Route::post('/createsingle', 'storeSingleData');
     //     Route::post('/update/{id}', 'updateSingleData');
     //     Route::post('/deletesingle', 'destroySingleData');
